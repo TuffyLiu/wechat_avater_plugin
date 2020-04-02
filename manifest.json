@@ -1,0 +1,39 @@
+{
+	"name": "全家福生成器",
+	"short_name": "全家福生成器",
+	"manifest_version": 2,
+	"version": "1.0",
+	"description": "幸福双翼微信头像全家福生成器",
+	"browser_action": {
+		"default_icon": "img/favicon-512x512.png",
+		"default_title": "幸福双翼"
+	},
+	"icons": {
+		"16": "img/favicon-512x512.png",
+		"48": "img/favicon-512x512.png",
+		"128": "img/favicon-512x512.png"
+	},
+	"permissions": [
+		"https://wx2.qq.com/*"
+	],
+	"background": {
+		"scripts": [
+			"background.js"
+		],
+		"persistent": false
+	},
+	"content_scripts": [
+		{
+			"matches": [
+				"https://wx2.qq.com/*"
+			],
+			"css": [
+				"default.css"
+			],
+			"js": [
+				"Sortable.min.js",
+				"default.js"
+			]
+		}
+	]
+}
