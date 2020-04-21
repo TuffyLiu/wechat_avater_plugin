@@ -16,12 +16,24 @@ popup.innerHTML = `
                 <input type="number" id = "XingFu_input_t"> 
             </div>
             <div class="XingFu_line">
-                <label class="XingFu_title">班主任助理圆圈大小</label>
+                <label class="XingFu_title">助理圆圈大小</label>
                 <input type="number" id = "XingFu_input_h"> 
             </div>
             <div class="XingFu_line">
                 <label class="XingFu_title">学员圆圈大小</label>
                 <input type="number" id = "XingFu_input_s"> 
+            </div>
+            <div class="XingFu_line">
+                <label class="XingFu_title">班主任/助理距离</label>
+                <input type="number" id = "XingFu_input_t_h"> 
+            </div>
+            <div class="XingFu_line">
+                <label class="XingFu_title">助理/学员距离</label>
+                <input type="number" id = "XingFu_input_h_s"> 
+            </div>
+            <div class="XingFu_line">
+                <label class="XingFu_title">学员之间距离</label>
+                <input type="number" id = "XingFu_input_l"> 
             </div>
             
         </div>
@@ -211,6 +223,9 @@ function addUser(user) {
     document.getElementById('XingFu_input_t').value = 45;
     document.getElementById('XingFu_input_h').value = 34;
     document.getElementById('XingFu_input_s').value = sr;
+    document.getElementById('XingFu_input_t_h').value = 5;
+    document.getElementById('XingFu_input_h_s').value = 10;
+    document.getElementById('XingFu_input_l').value = Math.round(sr / 3);
     document.getElementById('XingFu_input_c').value = '1010班全家福';
     document.getElementById('XingFu_img').style.display = 'none';
     document.getElementById('XingFu_close').addEventListener(
@@ -266,34 +281,42 @@ function createCard(teacher, help, student) {
         ctx.textAlign = 'center';
         ctx.fillText(document.getElementById('XingFu_input_c').value, canvas.width / 2, 320);
         ctx.restore();
-        const centerX = canvas.width / 2 - 26;
-        const centerY = canvas.height / 2 + 60;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2 + 70;
         let hR = 100;
         let tr = +document.getElementById('XingFu_input_t').value;
         let hr = +document.getElementById('XingFu_input_h').value;
+        let thr = +document.getElementById('XingFu_input_t_h').value;
+        let tR = 0;
         if (teacher.length === 1) {
-            circleImg(ctx, teacher.shift(), centerX - tr / 2, centerY - tr / 2, tr, 3);
-            hR = tr + 3 + (hr + 2) + 20;
+            circleImg(ctx, teacher.shift(), centerX - tr, centerY - tr, tr, 3);
+            tR = tr;
         } else if (teacher.length === 2) {
-            circleImg(ctx, teacher.shift(), centerX - tr - tr / 2, centerY - tr / 2, tr, 3);
-            circleImg(ctx, teacher.shift(), centerX + tr - tr / 2, centerY - tr / 2, tr, 3);
-            hR = (tr + 3) * 2 + (hr + 2) + 20;
+            circleImg(ctx, teacher.shift(), centerX - tr - tr - 4, centerY - tr, tr, 3);
+            circleImg(ctx, teacher.shift(), centerX - tr + tr + 4, centerY - tr, tr, 3);
+            tR = 2 * tr + 8;
         } else if (teacher.length === 3) {
-            drawPolygons(teacher, ctx, centerX, centerY, 2 * tr, teacher.length, tr, 3);
-            hR = (tr + 3) * 2 + (hr + 2) + 20;
+            tR = (2 / 3) * 2 * tr;
+            drawPolygons(teacher, ctx, centerX - tr, centerY - tr, tR, teacher.length, tr, 3);
+            tR = tR + tr;
         } else {
-            hR = 150;
+            tR = Math.floor((teacher.length * 2 * ((4 / 3) * tr)) / (Math.PI * 2));
+            drawPolygons(teacher, ctx, centerX - tr, centerY - tr, tR, teacher.length, tr, 3);
+            tR = tR + tr;
         }
 
-        drawPolygons(help, ctx, centerX - hr / 3, centerY - hr / 3, hR, help.length, hr, 2);
+        hR = tR + tr + thr;
+        drawPolygons(help, ctx, centerX - hr, centerY - hr, hR, help.length, hr, 2);
 
         let sr = +document.getElementById('XingFu_input_s').value;
-        let wr = 2 * sr + sr / 3;
+        let lsr = +document.getElementById('XingFu_input_l').value;
+        let hsr = +document.getElementById('XingFu_input_h_s').value;
+        let wr = 2 * sr + lsr;
 
         let i = 1;
         while (student.length > 0) {
-            let R = hR + sr + 20 + i * wr;
-            drawPolygons(student, ctx, centerX, centerY, R, Math.min(Math.floor((R * Math.PI * 2) / wr), student.length), sr);
+            let R = hR + sr + hsr + i * wr;
+            drawPolygons(student, ctx, centerX - sr, centerY - sr, R, Math.min(Math.floor((R * Math.PI * 2) / wr), student.length), sr);
             i++;
         }
         document.getElementById('XingFu_card').src = canvas.toDataURL('image/png');
