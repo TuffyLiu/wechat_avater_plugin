@@ -142,7 +142,7 @@ function addUser(user) {
     let sLength = 0;
 
     user.forEach(e => {
-        if (e.nickname.indexOf('班主任') !== -1) {
+        if (e.nickname.indexOf('班主任') !== -1 || e.nickname.indexOf('班班') !== -1) {
             //班主任
             teacher =
                 teacher +
@@ -152,7 +152,7 @@ function addUser(user) {
                 <p class="XingFu_nickname">${e.nickname}</p>
             </div>
             `;
-        } else if (e.nickname.indexOf('学长') !== -1 || e.nickname.indexOf('学姐') !== -1) {
+        } else if (e.nickname.indexOf('学长') !== -1 || e.nickname.indexOf('学姐') !== -1 || e.nickname.indexOf('副班') !== -1) {
             //学长
             help =
                 help +
@@ -294,7 +294,7 @@ function createCard(teacher, help, student) {
 function drawPolygons(student, ctx, xCenter, yCenter, radius, sides, picr, line) {
     const radAngle = (Math.PI * 2) / sides;
     const radAlpha = -Math.PI / 2;
-    for (var i = 0; i <= sides; i++) {
+    for (var i = 0; i < sides; i++) {
         let rad = radAngle * i + radAlpha;
         let xPos = xCenter + Math.cos(rad) * radius;
         let yPos = yCenter + Math.sin(rad) * radius;
