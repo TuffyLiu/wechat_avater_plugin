@@ -59,7 +59,7 @@ popup.addEventListener(
             popup.style.display = 'none';
         } else {
             getImgs().then(
-                imgs => {
+                (imgs) => {
                     addUser(imgs);
                     popup.style.display = 'block';
                 },
@@ -73,7 +73,7 @@ popup.addEventListener(
 );
 document.getElementById('XingFu_container').addEventListener(
     'click',
-    e => {
+    (e) => {
         e.preventDefault();
         e.stopPropagation();
     },
@@ -81,56 +81,72 @@ document.getElementById('XingFu_container').addEventListener(
 );
 
 const teacher = new Sortable(document.getElementById('XingFu_teacher'), {
+    multiDrag: true,
     group: 'user',
-    selectedClass: 'XingFu_user',
-    animation: 150
+    selectedClass: 'selected',
+    animation: 150,
 });
 const help = new Sortable(document.getElementById('XingFu_help'), {
+    multiDrag: true,
     group: 'user',
-    selectedClass: 'XingFu_user',
-    animation: 150
+    selectedClass: 'selected',
+    animation: 150,
 });
 const student = new Sortable(document.getElementById('XingFu_student'), {
+    multiDrag: true,
     group: 'user',
-    selectedClass: 'XingFu_user',
-    animation: 150
+    selectedClass: 'selected',
+    animation: 150,
 });
 const remove = new Sortable(document.getElementById('XingFu_remove'), {
+    multiDrag: true,
     group: 'user',
-    selectedClass: 'XingFu_user',
-    animation: 150
+    selectedClass: 'selected',
+    animation: 150,
 });
 
 document.getElementById('XingFu_btn').addEventListener(
     'click',
-    e => {
+    (e) => {
         createCard(teacher.toArray(), help.toArray(), student.toArray());
     },
     false
 );
 
 function getImgs() {
-    return new Promise(function(resolve, reject) {
-        const poi = document.getElementsByClassName('poi');
-        if (poi.length > 0) {
-            poi[0].click();
-            setTimeout(() => {
-                if (document.getElementsByClassName('members').length > 0) {
-                    let imgs = document.getElementsByClassName('members')[0].getElementsByClassName('avatar');
-                    imgs = [...imgs];
-                    imgs = imgs.map(e => {
-                        return {
-                            nickname: e.nextElementSibling.innerHTML,
-                            avatar: e.src
-                        };
-                    });
-                    resolve(imgs);
-                } else {
-                    reject(new Error('missing div'));
-                }
-            }, 800);
+    return new Promise(function (resolve, reject) {
+        if (document.getElementsByClassName('members').length > 0) {
+            let imgs = document.getElementsByClassName('members')[0].getElementsByClassName('avatar');
+            imgs = [...imgs];
+            imgs = imgs.map((e) => {
+                return {
+                    nickname: e.nextElementSibling.innerHTML,
+                    avatar: e.src,
+                };
+            });
+            resolve(imgs);
         } else {
-            reject(new Error('missing div'));
+            const poi = document.getElementsByClassName('poi');
+            if (poi.length > 0) {
+                poi[0].click();
+                setTimeout(() => {
+                    if (document.getElementsByClassName('members').length > 0) {
+                        let imgs = document.getElementsByClassName('members')[0].getElementsByClassName('avatar');
+                        imgs = [...imgs];
+                        imgs = imgs.map((e) => {
+                            return {
+                                nickname: e.nextElementSibling.innerHTML,
+                                avatar: e.src,
+                            };
+                        });
+                        resolve(imgs);
+                    } else {
+                        reject(new Error('missing div'));
+                    }
+                }, 800);
+            } else {
+                reject(new Error('missing div'));
+            }
         }
     });
 }
@@ -141,13 +157,13 @@ function addUser(user) {
     let student = '';
     let sLength = 0;
 
-    user.forEach(e => {
+    user.forEach((e) => {
         if (e.nickname.indexOf('班主任') !== -1 || e.nickname.indexOf('班班') !== -1) {
             //班主任
             teacher =
                 teacher +
                 `
-            <div class="XingFu_user" data-id="${e.avatar}">
+            <div  data-id="${e.avatar}">
                 <img class="XingFu_avater" src="${e.avatar}" alt="">
                 <p class="XingFu_nickname">${e.nickname}</p>
             </div>
@@ -157,7 +173,7 @@ function addUser(user) {
             help =
                 help +
                 `
-            <div class="XingFu_user" data-id="${e.avatar}">
+            <div  data-id="${e.avatar}">
                 <img class="XingFu_avater" src="${e.avatar}" alt="">
                 <p class="XingFu_nickname">${e.nickname}</p>
             </div>
@@ -167,7 +183,7 @@ function addUser(user) {
             student =
                 student +
                 `
-            <div class="XingFu_user" data-id="${e.avatar}">
+            <div  data-id="${e.avatar}">
                 <img class="XingFu_avater" src="${e.avatar}" alt="">
                 <p class="XingFu_nickname">${e.nickname}</p>
             </div>
@@ -199,7 +215,7 @@ function addUser(user) {
     document.getElementById('XingFu_img').style.display = 'none';
     document.getElementById('XingFu_close').addEventListener(
         'click',
-        e => {
+        (e) => {
             document.getElementById('XingFu_img').style.display = 'none';
         },
         false
