@@ -29,10 +29,20 @@
 }
 .XingFu_item_1 {
     flex: 1;
-    margin: 10px;
 }
 .XingFu_item_2 {
     flex: 2;
+}
+.drag_file {
+    background-color: #eee;
+    height: 300px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+}
+.XingFu_item {
     margin: 10px;
 }
 .XingFu_btn {
@@ -94,6 +104,12 @@
 .XingFu_nickname {
     font-size: 12px;
     line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    /*! autoprefixer: off */
+    -webkit-box-orient: vertical;
 }
 #XingFu_remove {
     filter: grayscale(100%);

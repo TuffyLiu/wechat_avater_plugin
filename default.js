@@ -6,52 +6,60 @@ popup.innerHTML = `
 <div class="XingFu_container" id="XingFu_container">
     <div class="XingFu_flex">
         <div class="XingFu_item_1">
-            <button class="XingFu_btn" id="XingFu_btn">生成全家福</button>   
-            <div class="XingFu_line">
-                <label class="XingFu_title">班级</label>
-                <input type="text" id = "XingFu_input_c"> 
+            <div class="XingFu_item">
+                <button class="XingFu_btn" id="XingFu_btn">生成全家福</button>   
+                <div class="XingFu_line">
+                    <label class="XingFu_title">班级</label>
+                    <input type="text" id = "XingFu_input_c"> 
+                </div>
+                <div class="XingFu_line">
+                    <label class="XingFu_title">班主任圆圈大小</label>
+                    <input type="number" id = "XingFu_input_t"> 
+                </div>
+                <div class="XingFu_line">
+                    <label class="XingFu_title">助理圆圈大小</label>
+                    <input type="number" id = "XingFu_input_h"> 
+                </div>
+                <div class="XingFu_line">
+                    <label class="XingFu_title">学员圆圈大小</label>
+                    <input type="number" id = "XingFu_input_s"> 
+                </div>
+                <div class="XingFu_line">
+                    <label class="XingFu_title">班主任/助理距离</label>
+                    <input type="number" id = "XingFu_input_t_h"> 
+                </div>
+                <div class="XingFu_line">
+                    <label class="XingFu_title">助理/学员距离</label>
+                    <input type="number" id = "XingFu_input_h_s"> 
+                </div>
+                <div class="XingFu_line">
+                    <label class="XingFu_title">学员之间距离</label>
+                    <input type="number" id = "XingFu_input_l"> 
+                </div>
             </div>
-            <div class="XingFu_line">
-                <label class="XingFu_title">班主任圆圈大小</label>
-                <input type="number" id = "XingFu_input_t"> 
+            <div class="XingFu_item">
+                <div class="drag_file" id="dragFile">
+                    <p>+ 点击添加头像</p>
+                    <input type="file" multiple accept="image/png, image/jpeg, mage/jpg" id="xFile"  style="position:absolute;clip:rect(0 0 0 0);">
+                </div>
             </div>
-            <div class="XingFu_line">
-                <label class="XingFu_title">助理圆圈大小</label>
-                <input type="number" id = "XingFu_input_h"> 
-            </div>
-            <div class="XingFu_line">
-                <label class="XingFu_title">学员圆圈大小</label>
-                <input type="number" id = "XingFu_input_s"> 
-            </div>
-            <div class="XingFu_line">
-                <label class="XingFu_title">班主任/助理距离</label>
-                <input type="number" id = "XingFu_input_t_h"> 
-            </div>
-            <div class="XingFu_line">
-                <label class="XingFu_title">助理/学员距离</label>
-                <input type="number" id = "XingFu_input_h_s"> 
-            </div>
-            <div class="XingFu_line">
-                <label class="XingFu_title">学员之间距离</label>
-                <input type="number" id = "XingFu_input_l"> 
-            </div>
-            
         </div>
         <div class="XingFu_item_2">
-            <p class="XingFu_title">移除部分</p>
-            <div class="XingFu_list" id="XingFu_remove"></div>
+            <div class="XingFu_item">
+                <p class="XingFu_title">班主任</p>
+                <div class="XingFu_list" id="XingFu_teacher"></div>
+            </div>
+            <div class="XingFu_item">
+                <p class="XingFu_title">班主任助理</p>
+                <div class="XingFu_list" id="XingFu_help"></div>
+            </div>
+            <div class="XingFu_item">
+                <p class="XingFu_title">移除部分</p>
+                <div class="XingFu_list" id="XingFu_remove"></div>
+            </div>
         </div>
     </div>
-    <div class="XingFu_flex">
-        <div class="XingFu_item_1">
-            <p class="XingFu_title">班主任</p>
-            <div class="XingFu_list" id="XingFu_teacher"></div>
-        </div>
-        <div class="XingFu_item_2">
-            <p class="XingFu_title">班主任助理</p>
-            <div class="XingFu_list" id="XingFu_help"></div>
-        </div>
-    </div>
+    
     <p class="XingFu_title">学员</p>
     <div class="XingFu_list" id="XingFu_student"></div>
     <canvas id="XingFu_canvas" class="XingFu_canvas" width="1123" height="1587"></canvas>
@@ -63,6 +71,54 @@ popup.innerHTML = `
 `;
 
 document.body.appendChild(popup);
+
+const dragFile = document.getElementById('dragFile');
+const xFile = document.getElementById('xFile');
+const list = popup.querySelectorAll('.XingFu_list');
+
+dragFile.addEventListener(
+    'click',
+    (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        xFile.click();
+    },
+    false
+);
+
+xFile.addEventListener(
+    'click',
+    (e) => {
+        e.stopPropagation();
+    },
+    false
+);
+
+xFile.addEventListener(
+    'change',
+    (e) => {
+        appendFile(xFile.files);
+        xFile.value = null;
+    },
+    false
+);
+
+function appendFile(files) {
+    for (file of files) {
+        let url = window.URL.createObjectURL(file);
+        const key = '编号' + Math.round(Math.random() * 1000);
+        const temp = document.createElement('div');
+
+        let liStr = `
+            <div  data-id="${url}">
+                <img class="XingFu_avater" src="${url}" alt="">
+                <p class="XingFu_nickname">${key}</p>
+            </div>
+        `;
+        temp.innerHTML = liStr.trim();
+        list[3].insertBefore(temp.firstChild, list[3].firstChild);
+    }
+}
 
 popup.addEventListener(
     'click',
@@ -96,25 +152,25 @@ const teacher = new Sortable(document.getElementById('XingFu_teacher'), {
     multiDrag: true,
     group: 'user',
     selectedClass: 'selected',
-    animation: 150,
+    animation: 150
 });
 const help = new Sortable(document.getElementById('XingFu_help'), {
     multiDrag: true,
     group: 'user',
     selectedClass: 'selected',
-    animation: 150,
+    animation: 150
 });
 const student = new Sortable(document.getElementById('XingFu_student'), {
     multiDrag: true,
     group: 'user',
     selectedClass: 'selected',
-    animation: 150,
+    animation: 150
 });
 const remove = new Sortable(document.getElementById('XingFu_remove'), {
     multiDrag: true,
     group: 'user',
     selectedClass: 'selected',
-    animation: 150,
+    animation: 150
 });
 
 document.getElementById('XingFu_btn').addEventListener(
@@ -133,7 +189,7 @@ function getImgs() {
             imgs = imgs.map((e) => {
                 return {
                     nickname: e.nextElementSibling.innerHTML,
-                    avatar: e.src,
+                    avatar: e.src
                 };
             });
             resolve(imgs);
@@ -148,7 +204,7 @@ function getImgs() {
                         imgs = imgs.map((e) => {
                             return {
                                 nickname: e.nextElementSibling.innerHTML,
-                                avatar: e.src,
+                                avatar: e.src
                             };
                         });
                         resolve(imgs);
@@ -163,7 +219,6 @@ function getImgs() {
     });
 }
 function addUser(user) {
-    const list = popup.querySelectorAll('.XingFu_list');
     let teacher = '';
     let help = '';
     let student = '';
@@ -202,8 +257,10 @@ function addUser(user) {
             `;
         }
     });
+
     list[0].innerHTML = teacher;
-    list[2].innerHTML = help;
+    list[1].innerHTML = help;
+    list[2].innerHTML = '';
     list[3].innerHTML = student;
 
     let sr = 14;
@@ -237,10 +294,8 @@ function addUser(user) {
     );
 }
 function circleImg(ctx, imgSrc, x, y, r, line) {
-    // console.log(imgSrc, x, y, r);
     ctx.save();
-    let img = new Image();
-    img.src = imgSrc;
+
     if (line > 0) {
         r = r - line + 1;
     }
@@ -252,6 +307,8 @@ function circleImg(ctx, imgSrc, x, y, r, line) {
     ctx.clip();
     ctx.stroke();
     ctx.closePath();
+    let img = new Image();
+    img.src = imgSrc;
     ctx.drawImage(img, x, y, d, d);
     ctx.restore();
     if (line > 0) {
