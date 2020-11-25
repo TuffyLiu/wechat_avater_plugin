@@ -21,6 +21,10 @@
     overflow: scroll;
     margin: auto;
     border-radius: 6px;
+    font-size: 14px;
+}
+.XingFu_container input {
+    border: 1px solid #999;
 }
 .XingFu_flex {
     display: flex;
