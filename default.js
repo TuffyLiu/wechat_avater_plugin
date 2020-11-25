@@ -39,8 +39,14 @@ popup.innerHTML = `
             </div>
             <div class="XingFu_item">
                 <div class="drag_file" id="dragFile">
-                    <p>+ 点击添加头像</p>
+                    <p>+ 添加头像图片</p>
                     <input type="file" multiple accept="image/png, image/jpeg, mage/jpg" id="xFile"  style="position:absolute;clip:rect(0 0 0 0);">
+                </div>
+            </div>
+            <div class="XingFu_item">
+                <div class="drag_file" id="dragFileJson">
+                    <p>+ 上传头像文件</p>
+                    <input type="file" accept="application/json" id="xFileJson"  style="position:absolute;clip:rect(0 0 0 0);">
                 </div>
             </div>
         </div>
@@ -73,7 +79,9 @@ popup.innerHTML = `
 document.body.appendChild(popup);
 
 const dragFile = document.getElementById('dragFile');
+const dragFileJson = document.getElementById('dragFileJson');
 const xFile = document.getElementById('xFile');
+const xFileJson = document.getElementById('xFileJson');
 const list = popup.querySelectorAll('.XingFu_list');
 
 dragFile.addEventListener(
@@ -85,11 +93,35 @@ dragFile.addEventListener(
     },
     false
 );
+dragFileJson.addEventListener(
+    'click',
+    (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        xFileJson.click();
+    },
+    false
+);
 
 xFile.addEventListener(
     'click',
     (e) => {
         e.stopPropagation();
+    },
+    false
+);
+xFileJson.addEventListener(
+    'click',
+    (e) => {
+        e.stopPropagation();
+    },
+    false
+);
+xFileJson.addEventListener(
+    'change',
+    (e) => {
+        appendFileJson(xFileJson.files);
+        xFileJson.value = null;
     },
     false
 );
@@ -102,6 +134,27 @@ xFile.addEventListener(
     },
     false
 );
+
+function appendFileJson(files) {
+    for (file of files) {
+        const reader = new FileReader();
+        reader.readAsText(file, 'UTF-8');
+        reader.onload = function (evt) {
+            const fileJson = JSON.parse(evt.target.result);
+            fileJson.forEach((item) => {
+                const temp = document.createElement('div');
+                let liStr = `
+                    <div  data-id="${item.head_img}">
+                        <img id="${item.head_img}" class="XingFu_avater" src="${item.head_img}" alt="">
+                        <p class="XingFu_nickname">${item.nick_name}</p>
+                    </div>
+                `;
+                temp.innerHTML = liStr.trim();
+                list[3].insertBefore(temp.firstChild, list[3].firstChild);
+            });
+        };
+    }
+}
 
 function appendFile(files) {
     for (file of files) {
@@ -209,11 +262,13 @@ function getImgs() {
                         });
                         resolve(imgs);
                     } else {
-                        reject(new Error('missing div'));
+                        resolve([]);
+                        // reject(new Error('missing div'));
                     }
                 }, 800);
             } else {
-                reject(new Error('missing div'));
+                resolve([]);
+                // reject(new Error('missing div'));
             }
         }
     });
@@ -293,35 +348,41 @@ function addUser(user) {
         false
     );
 }
-function circleImg(ctx, imgSrc, x, y, r, line) {
-    ctx.save();
+const circleImg = function (ctx, imgSrc, x, y, r, line) {
+    return new Promise((resolve) => {
+        let img = new Image();
+        img.src = imgSrc;
+        img.setAttribute('crossOrigin', 'anonymous');
+        img.onload = () => {
+            ctx.save();
 
-    if (line > 0) {
-        r = r - line + 1;
-    }
-    let d = 2 * r;
-    let cx = x + r;
-    let cy = y + r;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-    ctx.clip();
-    ctx.stroke();
-    ctx.closePath();
-    let img = new Image();
-    img.src = imgSrc;
-    ctx.drawImage(img, x, y, d, d);
-    ctx.restore();
-    if (line > 0) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.strokeStyle = '#ecc489';
-        ctx.lineWidth = line;
-        ctx.arc(cx, cy, r + line, 0, 2 * Math.PI);
-        ctx.stroke();
-        ctx.closePath();
-        ctx.restore();
-    }
-}
+            if (line > 0) {
+                r = r - line + 1;
+            }
+            let d = 2 * r;
+            let cx = x + r;
+            let cy = y + r;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+            ctx.clip();
+            ctx.stroke();
+            ctx.closePath();
+            ctx.drawImage(img, x, y, d, d);
+            ctx.restore();
+            if (line > 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = '#ecc489';
+                ctx.lineWidth = line;
+                ctx.arc(cx, cy, r + line, 0, 2 * Math.PI);
+                ctx.stroke();
+                ctx.closePath();
+                ctx.restore();
+            }
+            resolve();
+        };
+    });
+};
 
 function createCard(teacher, help, student) {
     const canvas = document.getElementById('XingFu_canvas');
@@ -329,57 +390,61 @@ function createCard(teacher, help, student) {
     const image = new Image();
     image.setAttribute('crossOrigin', 'anonymous');
     image.onload = () => {
-        ctx.save();
-        ctx.drawImage(image, 0, 0);
-        ctx.restore();
-        ctx.save();
-        ctx.font = '68px 方正胖娃简体';
-        ctx.fillStyle = '#ffffff';
-        ctx.textAlign = 'center';
-        ctx.fillText(document.getElementById('XingFu_input_c').value, canvas.width / 2, 320);
-        ctx.restore();
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2 + 70;
-        let hR = 100;
-        let tr = +document.getElementById('XingFu_input_t').value;
-        let hr = +document.getElementById('XingFu_input_h').value;
-        let thr = +document.getElementById('XingFu_input_t_h').value;
-        let tR = 0;
-        if (teacher.length === 1) {
-            circleImg(ctx, teacher.shift(), centerX - tr, centerY - tr, tr, 3);
-            tR = tr;
-        } else if (teacher.length === 2) {
-            circleImg(ctx, teacher.shift(), centerX - tr - tr - 4, centerY - tr, tr, 3);
-            circleImg(ctx, teacher.shift(), centerX - tr + tr + 4, centerY - tr, tr, 3);
-            tR = 2 * tr + 8;
-        } else if (teacher.length === 3) {
-            tR = (2 / 3) * 2 * tr;
-            drawPolygons(teacher, ctx, centerX - tr, centerY - tr, tR, teacher.length, tr, 3);
-            tR = tR + tr;
-        } else {
-            tR = Math.floor((teacher.length * 2 * ((4 / 3) * tr)) / (Math.PI * 2));
-            drawPolygons(teacher, ctx, centerX - tr, centerY - tr, tR, teacher.length, tr, 3);
-            tR = tR + tr;
-        }
-
-        hR = tR + tr + thr;
-        drawPolygons(help, ctx, centerX - hr, centerY - hr, hR, help.length, hr, 2);
-
-        let sr = +document.getElementById('XingFu_input_s').value;
-        let lsr = +document.getElementById('XingFu_input_l').value;
-        let hsr = +document.getElementById('XingFu_input_h_s').value;
-        let wr = 2 * sr + lsr;
-
-        let i = 1;
-        while (student.length > 0) {
-            let R = hR + sr + hsr + i * wr;
-            drawPolygons(student, ctx, centerX - sr, centerY - sr, R, Math.min(Math.floor((R * Math.PI * 2) / wr), student.length), sr);
-            i++;
-        }
-        document.getElementById('XingFu_card').src = canvas.toDataURL('image/png');
-        document.getElementById('XingFu_img').style.display = 'block';
+        createCardImg(teacher, help, student, ctx, canvas, image);
     };
     image.src = 'https://puui.qpic.cn/fans_admin/0/3_311592059_1583336460712/0';
+}
+
+async function createCardImg(teacher, help, student, ctx, canvas, image) {
+    ctx.save();
+    ctx.drawImage(image, 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.font = '68px 方正胖娃简体';
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.fillText(document.getElementById('XingFu_input_c').value, canvas.width / 2, 320);
+    ctx.restore();
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2 + 70;
+    let hR = 100;
+    let tr = +document.getElementById('XingFu_input_t').value;
+    let hr = +document.getElementById('XingFu_input_h').value;
+    let thr = +document.getElementById('XingFu_input_t_h').value;
+    let tR = 0;
+    if (teacher.length === 1) {
+        let v = await circleImg(ctx, teacher.shift(), centerX - tr, centerY - tr, tr, 3);
+        tR = tr;
+    } else if (teacher.length === 2) {
+        await circleImg(ctx, teacher.shift(), centerX - tr - tr - 4, centerY - tr, tr, 3);
+        await circleImg(ctx, teacher.shift(), centerX - tr + tr + 4, centerY - tr, tr, 3);
+        tR = 2 * tr + 8;
+    } else if (teacher.length === 3) {
+        tR = (2 / 3) * 2 * tr;
+        await drawPolygons(teacher, ctx, centerX - tr, centerY - tr, tR, teacher.length, tr, 3);
+        tR = tR + tr;
+    } else {
+        tR = Math.floor((teacher.length * 2 * ((4 / 3) * tr)) / (Math.PI * 2));
+        await drawPolygons(teacher, ctx, centerX - tr, centerY - tr, tR, teacher.length, tr, 3);
+        tR = tR + tr;
+    }
+
+    hR = tR + tr + thr;
+    await drawPolygons(help, ctx, centerX - hr, centerY - hr, hR, help.length, hr, 2);
+
+    let sr = +document.getElementById('XingFu_input_s').value;
+    let lsr = +document.getElementById('XingFu_input_l').value;
+    let hsr = +document.getElementById('XingFu_input_h_s').value;
+    let wr = 2 * sr + lsr;
+
+    let i = 1;
+    while (student.length > 0) {
+        let R = hR + sr + hsr + i * wr;
+        await drawPolygons(student, ctx, centerX - sr, centerY - sr, R, Math.min(Math.floor((R * Math.PI * 2) / wr), student.length), sr);
+        i++;
+    }
+    document.getElementById('XingFu_card').src = canvas.toDataURL('image/png');
+    document.getElementById('XingFu_img').style.display = 'block';
 }
 
 // @param {CanvasRenderingContext2D} ctx
@@ -387,13 +452,13 @@ function createCard(teacher, help, student) {
 // @param {Number} yCenter 中心坐标Y点
 // @param {Number} radius 外圆半径
 // @param {Number} sides 多边形边数
-function drawPolygons(student, ctx, xCenter, yCenter, radius, sides, picr, line) {
+async function drawPolygons(student, ctx, xCenter, yCenter, radius, sides, picr, line) {
     const radAngle = (Math.PI * 2) / sides;
     const radAlpha = -Math.PI / 2;
     for (var i = 0; i < sides; i++) {
         let rad = radAngle * i + radAlpha;
         let xPos = xCenter + Math.cos(rad) * radius;
         let yPos = yCenter + Math.sin(rad) * radius;
-        circleImg(ctx, student.shift(), xPos, yPos, picr, line);
+        await circleImg(ctx, student.shift(), xPos, yPos, picr, line);
     }
 }
