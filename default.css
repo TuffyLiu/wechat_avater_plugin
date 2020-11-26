@@ -39,7 +39,7 @@
 }
 .drag_file {
     background-color: #eee;
-    height: 142px;
+    height: 90px;
     width: 100%;
     display: flex;
     justify-content: center;

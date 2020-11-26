@@ -49,6 +49,11 @@ popup.innerHTML = `
                     <input type="file" accept="application/json" id="xFileJson"  style="position:absolute;clip:rect(0 0 0 0);">
                 </div>
             </div>
+            <div class="XingFu_item">
+                <div class="drag_file" id="btn-clear">
+                    <p>- 清除所有头像</p>
+                </div>
+            </div>
         </div>
         <div class="XingFu_item_2">
             <div class="XingFu_item">
@@ -82,6 +87,7 @@ const dragFile = document.getElementById('dragFile');
 const dragFileJson = document.getElementById('dragFileJson');
 const xFile = document.getElementById('xFile');
 const xFileJson = document.getElementById('xFileJson');
+const btnClear = document.getElementById('btn-clear');
 const list = popup.querySelectorAll('.XingFu_list');
 
 dragFile.addEventListener(
@@ -134,6 +140,17 @@ xFile.addEventListener(
     },
     false
 );
+btnClear.addEventListener(
+    'click',
+    (e) => {
+        e.stopPropagation();
+        list[0].innerHTML = '';
+        list[1].innerHTML = '';
+        list[2].innerHTML = '';
+        list[3].innerHTML = '';
+    },
+    false
+);
 
 function appendFileJson(files) {
     for (file of files) {
@@ -142,15 +159,17 @@ function appendFileJson(files) {
         reader.onload = function (evt) {
             const fileJson = JSON.parse(evt.target.result);
             fileJson.forEach((item) => {
-                const temp = document.createElement('div');
-                let liStr = `
+                if (item.head_img) {
+                    const temp = document.createElement('div');
+                    let liStr = `
                     <div  data-id="${item.head_img}">
                         <img id="${item.head_img}" class="XingFu_avater" src="${item.head_img}" alt="">
                         <p class="XingFu_nickname">${item.nick_name}</p>
                     </div>
                 `;
-                temp.innerHTML = liStr.trim();
-                list[3].insertBefore(temp.firstChild, list[3].firstChild);
+                    temp.innerHTML = liStr.trim();
+                    list[3].insertBefore(temp.firstChild, list[3].firstChild);
+                }
             });
         };
     }
@@ -229,6 +248,18 @@ const remove = new Sortable(document.getElementById('XingFu_remove'), {
 document.getElementById('XingFu_btn').addEventListener(
     'click',
     (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const option = {
+            XingFu_input_t: document.getElementById('XingFu_input_t').value,
+            XingFu_input_h: document.getElementById('XingFu_input_h').value,
+            XingFu_input_s: document.getElementById('XingFu_input_s').value,
+            XingFu_input_t_h: document.getElementById('XingFu_input_t_h').value,
+            XingFu_input_h_s: document.getElementById('XingFu_input_h_s').value,
+            XingFu_input_l: document.getElementById('XingFu_input_l').value,
+            XingFu_input_c: document.getElementById('XingFu_input_c').value
+        };
+        localStorage.XingFu_option = JSON.stringify(option);
         createCard(teacher.toArray(), help.toArray(), student.toArray());
     },
     false
@@ -332,13 +363,24 @@ function addUser(user) {
     } else {
         sr = 40;
     }
-    document.getElementById('XingFu_input_t').value = 45;
-    document.getElementById('XingFu_input_h').value = 34;
-    document.getElementById('XingFu_input_s').value = sr;
-    document.getElementById('XingFu_input_t_h').value = 5;
-    document.getElementById('XingFu_input_h_s').value = 10;
-    document.getElementById('XingFu_input_l').value = Math.round(sr / 3);
-    document.getElementById('XingFu_input_c').value = '1010班全家福';
+    const option = localStorage.XingFu_option
+        ? JSON.parse(localStorage.XingFu_option)
+        : {
+              XingFu_input_t: 45,
+              XingFu_input_h: 34,
+              XingFu_input_s: sr,
+              XingFu_input_t_h: 5,
+              XingFu_input_h_s: 10,
+              XingFu_input_l: Math.round(sr / 3),
+              XingFu_input_c: '1010班全家福'
+          };
+    document.getElementById('XingFu_input_t').value = option.XingFu_input_t;
+    document.getElementById('XingFu_input_h').value = option.XingFu_input_h;
+    document.getElementById('XingFu_input_s').value = option.XingFu_input_s;
+    document.getElementById('XingFu_input_t_h').value = option.XingFu_input_t_h;
+    document.getElementById('XingFu_input_h_s').value = option.XingFu_input_h_s;
+    document.getElementById('XingFu_input_l').value = option.XingFu_input_l;
+    document.getElementById('XingFu_input_c').value = option.XingFu_input_c;
     document.getElementById('XingFu_img').style.display = 'none';
     document.getElementById('XingFu_close').addEventListener(
         'click',
@@ -380,6 +422,10 @@ const circleImg = function (ctx, imgSrc, x, y, r, line) {
                 ctx.restore();
             }
             resolve();
+        };
+        img.onerror = () => {
+            console.log(imgSrc);
+            resolve('加载图片失败');
         };
     });
 };
