@@ -168,7 +168,13 @@ function appendFileJson(files) {
                     </div>
                 `;
                     temp.innerHTML = liStr.trim();
-                    list[3].insertBefore(temp.firstChild, list[3].firstChild);
+                    if (item.nick_name.indexOf('班主任') !== -1 || item.nick_name.indexOf('班班') !== -1) {
+                        list[0].insertBefore(temp.firstChild, list[0].firstChild);
+                    } else if (item.nick_name.indexOf('学长') !== -1 || item.nick_name.indexOf('学姐') !== -1 || item.nick_name.indexOf('副班') !== -1) {
+                        list[1].insertBefore(temp.firstChild, list[2].firstChild);
+                    } else {
+                        list[3].insertBefore(temp.firstChild, list[3].firstChild);
+                    }
                 }
             });
         };

@@ -14,7 +14,7 @@
 		"128": "img/favicon-512x512.png"
 	},
 	"permissions": [
-		"https://*/*"
+		"https://wx.qq.com/*"
 	],
 	"background": {
 		"scripts": [
@@ -25,7 +25,7 @@
 	"content_scripts": [
 		{
 			"matches": [
-				"https://*/*"
+				"https://wx.qq.com/*"
 			],
 			"css": [
 				"default.css"
