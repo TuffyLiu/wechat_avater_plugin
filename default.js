@@ -446,7 +446,7 @@ function createCard(teacher, help, student) {
     image.onload = () => {
         createCardImg(teacher, help, student, ctx, canvas, image);
     };
-    image.src = 'https://demo.xfwings.com.cn/h5/camp_bb_dev/dist/bg.jpg';
+    image.src = 'https://puui.qpic.cn/fans_admin/0/3_311592059_1583336460712/0';
 }
 
 async function createCardImg(teacher, help, student, ctx, canvas, image) {
