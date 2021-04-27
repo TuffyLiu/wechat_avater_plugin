@@ -14,7 +14,8 @@
 		"128": "img/favicon-512x512.png"
 	},
 	"permissions": [
-		"https://wx.qq.com/*"
+		"https://www.baidu.com/*",
+		"https://wx2.qq.com/*"
 	],
 	"background": {
 		"scripts": [
@@ -25,7 +26,8 @@
 	"content_scripts": [
 		{
 			"matches": [
-				"https://wx.qq.com/*"
+				"https://www.baidu.com/*",
+				"https://wx2.qq.com/*"
 			],
 			"css": [
 				"default.css"

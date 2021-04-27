@@ -273,6 +273,7 @@ document.getElementById('XingFu_btn').addEventListener(
 
 function getImgs() {
     return new Promise(function (resolve, reject) {
+        console.log(document.getElementsByClassName('members').length);
         if (document.getElementsByClassName('members').length > 0) {
             let imgs = document.getElementsByClassName('members')[0].getElementsByClassName('avatar');
             imgs = [...imgs];
@@ -285,6 +286,7 @@ function getImgs() {
             resolve(imgs);
         } else {
             const poi = document.getElementsByClassName('poi');
+            console.log(poi);
             if (poi.length > 0) {
                 poi[0].click();
                 setTimeout(() => {
@@ -444,7 +446,7 @@ function createCard(teacher, help, student) {
     image.onload = () => {
         createCardImg(teacher, help, student, ctx, canvas, image);
     };
-    image.src = 'https://puui.qpic.cn/fans_admin/0/3_311592059_1583336460712/0';
+    image.src = 'https://demo.xfwings.com.cn/h5/camp_bb_dev/dist/bg.jpg';
 }
 
 async function createCardImg(teacher, help, student, ctx, canvas, image) {
